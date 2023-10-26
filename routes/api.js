@@ -15,14 +15,19 @@ const storage = multer.diskStorage({
     // Full __dirname includes /routes
     // Want to remove that
 
-    // On windows character to split by is \\
-    // On linux (server) it is /
-    // Change this before uploading
-
     // TODO: Change back to forward slash
-    let dirnameSplit = __dirname.split("/");
-    dirnameSplit.pop();
-    let dirname = dirnameSplit.join("/");
+    let dirnameSplit;
+    let dirname;
+
+    if (process.env.NODE_ENV == "production") {
+      dirnameSplit = __dirname.split("/");
+      dirnameSplit.pop();
+      dirname = dirnameSplit.join("/");
+    } else if (process.env.NODE_ENV == "development") {
+      dirnameSplit = __dirname.split("\\");
+      dirnameSplit.pop();
+      dirname = dirnameSplit.join("\\");
+    }
 
     cb(null, path.join(dirname, "/public-images/"));
   },
