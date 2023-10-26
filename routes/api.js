@@ -70,6 +70,29 @@ route.post("/update-event", async (req, res) => {
   return res.send({ error: false, event: newEvent });
 });
 
+route.delete("/event", async (req, res) => {
+  let user = req.user;
+  if (!user) return res.send({ error: true, message: "Not logged in" })
+
+  const User = await UserConfig.findOne({ email: user.email });
+  if (!User) return res.send({ error: true, message: "User not found" });
+
+  let { eventUUID } = req.body
+  const EventCreatedBy = await EventModel.findOne(
+    { uuid: eventUUID },
+    "createdBy"
+  ).createdBy;
+
+  if (EventCreatedBy != user.uuid) 
+    return res.send({
+      error: true,
+      message: "You are not the user who made this event",
+    });
+
+  await EventModel.deleteOne({uuid: eventUUID})
+  return res.send({error: false, success: true})
+})
+
 route.get("/image/:uuid", (req, res) => {
   let { uuid } = req.params;
   res.sendFile("./public-images/" + uuid, { root: "./" });
