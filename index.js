@@ -1,3 +1,6 @@
+// npm run build in QRClient
+// Paste contents to /views
+
 require("dotenv").config();
 require("./database/connection");
 
@@ -12,12 +15,9 @@ const http = require("http").Server(app);
 const PORT = process.env.PORT || 3001;
 const routes = require("./routes");
 const serialize = require("./utils/serialize");
+const path = __dirname + '/views/';
 
-app.get("/", (req, res) => {
-  console.log("Main page");
-  res.send("Success!");
-});
-
+app.use(express.static(path));
 app.use(compression());
 // app.use(helmet());
 app.use(express.json());
@@ -44,5 +44,9 @@ app.use(async (req, res, next) => {
 });
 
 app.use("/", routes);
+
+app.get('/*', function (req,res) {
+  return res.sendFile(path + "index.html");
+});
 
 http.listen(PORT, () => console.log(`Running on ${PORT}`));
