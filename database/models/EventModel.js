@@ -13,6 +13,7 @@ const EventConfig = new mongoose.Schema(
     // Doesn't increment if maxCapacity is 0
     currentCapacity: Number,
     timeCreated: Date,
+    lastUpdated: Date,
     // "None", "Required", "Optional"
     furtherContact: String,
     fields: {

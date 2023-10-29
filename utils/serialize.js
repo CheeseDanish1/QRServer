@@ -3,9 +3,10 @@ const EventModel = require("../database/models/EventModel");
 module.exports.user = async (user) => {
   if (!user) return null;
 
+  // This is why the only fields are uuid and companyName
   let events = await EventModel.find(
     { createdBy: user._id },
-    "uuid companyName"
+    "uuid companyName createdBy lastUpdated timeCreated"
   );
 
   return {

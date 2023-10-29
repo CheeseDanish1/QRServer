@@ -19,15 +19,19 @@ const storage = multer.diskStorage({
     let dirnameSplit;
     let dirname;
 
-    if (process.env.NODE_ENV == "production") {
-      dirnameSplit = __dirname.split("/");
-      dirnameSplit.pop();
-      dirname = dirnameSplit.join("/");
-    } else if (process.env.NODE_ENV == "development") {
-      dirnameSplit = __dirname.split("\\");
-      dirnameSplit.pop();
-      dirname = dirnameSplit.join("\\");
-    }
+    dirnameSplit = __dirname.split("/");
+    dirnameSplit.pop();
+    dirname = dirnameSplit.join("/");
+
+    // if (process.env.NODE_ENV == "production") {
+    //   dirnameSplit = __dirname.split("/");
+    //   dirnameSplit.pop();
+    //   dirname = dirnameSplit.join("/");
+    // } else if (process.env.NODE_ENV == "development") {
+    //   dirnameSplit = __dirname.split("\\");
+    //   dirnameSplit.pop();
+    //   dirname = dirnameSplit.join("\\");
+    // }
 
     cb(null, path.join(dirname, "/public-images/"));
   },
@@ -39,6 +43,23 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
+
+route.get("/user/:userId", async (req, res) => {
+  if (!req.user) return res.send({ error: true, message: "Not logged in" });
+
+  const id = req.params.userId;
+
+  const User = await UserConfig.findById(id);
+  if (!User)
+    return res.send({ error: true, message: "No user with that id found" });
+
+  return res.send({
+    error: false,
+    user: {
+      username: User.username,
+    },
+  });
+});
 
 route.post("/update-event", async (req, res) => {
   let user = req.user;
@@ -65,33 +86,33 @@ route.post("/update-event", async (req, res) => {
     });
 
   await EventModel.deleteOne({ uuid: event.uuid });
-  let newEvent = await EventModel.create({ ...event });
+  let newEvent = await EventModel.create({ ...event, lastUpdated: new Date() });
 
   return res.send({ error: false, event: newEvent });
 });
 
 route.delete("/event", async (req, res) => {
   let user = req.user;
-  if (!user) return res.send({ error: true, message: "Not logged in" })
+  if (!user) return res.send({ error: true, message: "Not logged in" });
 
   const User = await UserConfig.findOne({ email: user.email });
   if (!User) return res.send({ error: true, message: "User not found" });
 
-  let { eventUUID } = req.body
+  let { eventUUID } = req.body;
   const EventCreatedBy = await EventModel.findOne(
     { uuid: eventUUID },
     "createdBy"
   ).createdBy;
 
-  if (EventCreatedBy != user.uuid) 
+  if (EventCreatedBy != user.uuid)
     return res.send({
       error: true,
       message: "You are not the user who made this event",
     });
 
-  await EventModel.deleteOne({uuid: eventUUID})
-  return res.send({error: false, success: true})
-})
+  await EventModel.deleteOne({ uuid: eventUUID });
+  return res.send({ error: false, success: true });
+});
 
 route.get("/image/:uuid", (req, res) => {
   let { uuid } = req.params;
@@ -182,6 +203,8 @@ route.post("/event/create", upload.single("image"), async (req, res) => {
   if (!body.companyName)
     return res.send({ error: true, message: "Company name is required" });
 
+  console.log(body, body.createdBy);
+
   let eventBody = {
     ...body,
     uuid,
@@ -189,7 +212,9 @@ route.post("/event/create", upload.single("image"), async (req, res) => {
     currentCapacity,
     timeCreated,
   };
+  console.log(eventBody.createdBy);
   let event = await EventModel.create(eventBody);
+  console.log(event.createdBy);
   return res.send({ error: false, event });
 });
 
