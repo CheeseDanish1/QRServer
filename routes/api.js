@@ -19,9 +19,9 @@ const storage = multer.diskStorage({
     let dirnameSplit;
     let dirname;
 
-    dirnameSplit = __dirname.split("\\");
+    dirnameSplit = __dirname.split("/");
     dirnameSplit.pop();
-    dirname = dirnameSplit.join("\\");
+    dirname = dirnameSplit.join("/");
 
     // if (process.env.NODE_ENV == "production") {
     //   dirnameSplit = __dirname.split("/");
