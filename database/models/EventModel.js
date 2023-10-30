@@ -3,7 +3,10 @@ const mongoose = require("mongoose");
 const EventConfig = new mongoose.Schema(
   {
     uuid: String,
-    createdBy: String,
+    createdBy: {
+      uuid: String,
+      username: String,
+    },
     companyName: String,
     startTime: Date,
     endTime: Date,

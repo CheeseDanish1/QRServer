@@ -19,9 +19,9 @@ const storage = multer.diskStorage({
     let dirnameSplit;
     let dirname;
 
-    dirnameSplit = __dirname.split("/");
+    dirnameSplit = __dirname.split("\\");
     dirnameSplit.pop();
-    dirname = dirnameSplit.join("/");
+    dirname = dirnameSplit.join("\\");
 
     // if (process.env.NODE_ENV == "production") {
     //   dirnameSplit = __dirname.split("/");
@@ -74,12 +74,14 @@ route.post("/update-event", async (req, res) => {
   if (!event || !event.uuid)
     return res.send({ error: true, message: "Event is null" });
 
-  const EventCreatedBy = await EventModel.findOne(
-    { uuid: event.uuid },
-    "createdBy"
+  const EventCreatedBy = (
+    await EventModel.findOne({ uuid: event.uuid }, "createdBy")
   ).createdBy;
 
-  if (EventCreatedBy != user.uuid)
+  if (!EventCreatedBy)
+    return res.send({ error: true, message: "No event found" });
+
+  if (EventCreatedBy.uuid != user.id)
     return res.send({
       error: true,
       message: "You are not the user who made this event",
@@ -104,7 +106,7 @@ route.delete("/event", async (req, res) => {
     "createdBy"
   ).createdBy;
 
-  if (EventCreatedBy != user.uuid)
+  if (EventCreatedBy.uuid != user.uuid)
     return res.send({
       error: true,
       message: "You are not the user who made this event",
@@ -191,6 +193,18 @@ route.post("/image/upload", upload.single("image"), async (req, res) => {
   return res.send({ error: false, filename: req.file.filename });
 });
 
+route.post("/user/upload", upload.single("image"), async (req, res) => {
+  if (!req.user) return res.send({ error: true, message: "Not logged in" });
+
+  let User = await UserConfig.findById(req.user.id);
+  if (!User) return res.send({ error: true, message: "No user found" });
+
+  User.profileImagePath = req.file.filename;
+  await User.save();
+
+  return res.send({ error: false, filename: req.file.filename });
+});
+
 route.post("/event/create", upload.single("image"), async (req, res) => {
   let body = req.body;
   let uuid = uuidv1();
@@ -203,8 +217,6 @@ route.post("/event/create", upload.single("image"), async (req, res) => {
   if (!body.companyName)
     return res.send({ error: true, message: "Company name is required" });
 
-  console.log(body, body.createdBy);
-
   let eventBody = {
     ...body,
     uuid,
@@ -212,9 +224,7 @@ route.post("/event/create", upload.single("image"), async (req, res) => {
     currentCapacity,
     timeCreated,
   };
-  console.log(eventBody.createdBy);
   let event = await EventModel.create(eventBody);
-  console.log(event.createdBy);
   return res.send({ error: false, event });
 });
 

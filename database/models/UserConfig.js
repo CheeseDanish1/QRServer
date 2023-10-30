@@ -5,6 +5,7 @@ const UserConfig = new mongoose.Schema(
     username: String,
     password: String,
     email: String,
+    profileImagePath: String,
   },
   { collection: "UserConfig", typeKey: "$type" }
 );

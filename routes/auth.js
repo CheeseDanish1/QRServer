@@ -80,6 +80,23 @@ router.post("/local/signup", async (req, res) => {
     });
 });
 
+router.post("/local/cookie", async (req, res) => {
+  if (!req.user) return res.send({ error: true, message: "Not logged in" });
+
+  const user = {
+    ...(await User.findById(req.user.id)),
+  }._doc;
+  const encryptedUser = encryptData(user, "1w");
+
+  return res
+    .status(200)
+    .cookie(COOKIE_NAME, encryptedUser, { httpOnly: true })
+    .send({
+      user: await serialize.user(user),
+      message: "Cookie updated!",
+    });
+});
+
 router.post("/local/logout", async (req, res) => {
   if (!req.user) return res.send({ message: "Unauthorized" });
 

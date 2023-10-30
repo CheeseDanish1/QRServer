@@ -5,13 +5,14 @@ module.exports.user = async (user) => {
 
   // This is why the only fields are uuid and companyName
   let events = await EventModel.find(
-    { createdBy: user._id },
+    { "createdBy.uuid": user._id },
     "uuid companyName createdBy lastUpdated timeCreated"
   );
 
   return {
     username: user.username,
     email: user.email,
+    profileImagePath: user.profileImagePath,
     events,
     id: user._id,
   };
