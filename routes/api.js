@@ -101,12 +101,13 @@ route.delete("/event", async (req, res) => {
   if (!User) return res.send({ error: true, message: "User not found" });
 
   let { eventUUID } = req.body;
-  const EventCreatedBy = await EventModel.findOne(
-    { uuid: eventUUID },
-    "createdBy"
-  ).createdBy;
+  console.log(eventUUID)
+  const EventCreatedBy = (
+    await EventModel.findOne({ uuid: eventUUID }, "createdBy")
+  )
+  if (!EventCreatedBy) return res.send({error: true, message: "Error not found"})
 
-  if (EventCreatedBy.uuid != user.uuid)
+  if (EventCreatedBy?.createdBy?.uuid != user.id)
     return res.send({
       error: true,
       message: "You are not the user who made this event",
