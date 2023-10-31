@@ -15,5 +15,8 @@ module.exports.user = async (user) => {
     profileImagePath: user.profileImagePath,
     events,
     id: user._id,
+    phoneNumber: user.phoneNumber,
+    address: user.address,
+    name: user.name
   };
 };
