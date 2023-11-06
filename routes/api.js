@@ -121,7 +121,7 @@ route.post("/user/general", async (req, res) => {
   return res.send({errror: false, user: serialize.user(User)})
 })
 
-route.post("update-event", async (req, res) => {
+route.post("/update-event", async (req, res) => {
   let user = req.user;
 
   if (!user) return res.send({ error: true, message: "Not logged in" });
