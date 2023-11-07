@@ -130,7 +130,7 @@ router.post("/local/login", async (req, res) => {
   return res
     .status(200)
     .cookie(COOKIE_NAME, encryptedUser, { httpOnly: true })
-    .setHeader("authorization", encryptedUser)
+    .setHeader(COOKIE_NAME, encryptedUser)
     .send({
       message: "Successfully logged in!",
       user,
