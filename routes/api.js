@@ -16,7 +16,6 @@ const storage = multer.diskStorage({
     // Full __dirname includes /routes
     // Want to remove that
 
-    // TODO: Change back to forward slash
     let dirnameSplit;
     let dirname;
 
@@ -342,6 +341,8 @@ route.post("/event/submission/:id", async (req, res) => {
       error: true,
       message: "There does not exist an event with this id",
     });
+
+  if (!event.furtherContact) event.furtherContact = "none"
 
   let fieldObject = {};
 
