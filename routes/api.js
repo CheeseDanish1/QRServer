@@ -5,12 +5,11 @@ const QRCode = require("qrcode");
 const multer = require("multer");
 const EventModel = require("../database/models/EventModel");
 const SubmissionModel = require("../database/models/SubmissionModel");
-const sendEmail = require("../utils/sendEmail");
+const { sendEmail, sendAnalytics } = require("../utils/sendEmail");
 const sendMessage = require("../utils/sms");
 const path = require("path");
 const UserConfig = require("../database/models/UserConfig");
 const serialize = require("../utils/serialize");
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // Full __dirname includes /routes
@@ -66,6 +65,34 @@ route.get("/user/:userId", async (req, res) => {
       username: User.username,
     },
   });
+});
+
+route.post("/send-analytics", async (req, res) => {
+  const { eventId, email } = req.body;
+  const user = req.user;
+  if (!user) return res.send({ error: true, message: "Not authorized" });
+
+  if (!email) return res.send({ error: true, message: "No email provided" });
+  if (!eventId)
+    return res.send({ error: true, message: "No event id provided" });
+
+  let emailRegex = new RegExp(
+    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  );
+  if (!emailRegex.test(email.toLowerCase()))
+    return res.send({ error: true, message: "Invalid email" });
+
+  const User = await UserConfig.findById(user.id);
+  if (!User) return res.send({ error: true, message: "User not found" });
+
+  const Event = await EventModel.findOne({ uuid: eventId });
+  if (!Event) return res.send({ error: true, message: "Event not found" });
+
+  const Submissions = await SubmissionModel.find({ eventUUID: eventId });
+
+  sendAnalytics({ emailAddress: email, jsonData: Submissions, event: Event });
+
+  res.send({ error: false, message: "Success" });
 });
 
 route.post("/user/general", async (req, res) => {
@@ -361,10 +388,11 @@ route.post("/event/submission/:id", async (req, res) => {
       message: "There does not exist an event with this id",
     });
 
-  if (!event.furtherContact) event.furtherContact = "none"
+  if (!event.furtherContact) event.furtherContact = "none";
 
   let fieldObject = {};
 
+  console.log(event?.furtherContact?.toLowerCase(), promotion);
   if (
     event?.furtherContact?.toLowerCase() == "required" &&
     !!promotion == false

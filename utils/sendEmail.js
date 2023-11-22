@@ -14,6 +14,41 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+async function sendAnalytics({ emailAddress, jsonData, event }) {
+  const json = {
+    data: jsonData.map((data) => {
+      const obj = {
+        eventUUID: data.eventUUID,
+        timeSubmitted: data.timeSubmitted,
+        prizeClaimedYet: data.prizeClaimed,
+        consent: data.consent,
+        fields: data.fields,
+      };
+      return obj;
+    }),
+  };
+
+  const mailOptions = {
+    from: EMAIL_ADDRESS,
+    to: emailAddress,
+    subject: `Analytic Data`, // Subject line
+    html: `<p>Attached is a json file containing all submissions for the event <bold>${event.companyName}</bold></p>`,
+    attachments: [
+      {
+        filename: "analytics.json",
+        content: JSON.stringify(json),
+        contentType: "application/json",
+      },
+    ],
+  };
+
+  transporter.sendMail(mailOptions, (error) => {
+    if (error) {
+      console.log(error);
+    }
+  });
+}
+
 async function sendEmail({ emailAddress, qrCodeId, companyName, emailHTML }) {
   if (!qrCodeId) return;
   if (!emailHTML) emailHTML = "";
@@ -47,6 +82,4 @@ async function sendEmail({ emailAddress, qrCodeId, companyName, emailHTML }) {
   });
 }
 
-sendEmail({ emailAddress: "pearlmans33737@gmail.com" });
-
-module.exports = sendEmail;
+module.exports = { sendEmail, sendAnalytics };
