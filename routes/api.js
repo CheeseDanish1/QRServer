@@ -50,6 +50,27 @@ route.get("/username/:userId", async (req, res) => {
   return res.send({ username: user.username });
 });
 
+route.get("/submissions/:eventId", async (req, res) => {
+  const id = req.params.eventId;
+
+  if (!req.user) return res.send({ error: true, message: "Unauthorized" });
+
+  const Event = await EventModel.findOne({ uuid: id });
+
+  if (!Event)
+    return res.send({ error: true, message: "No event with that id found" });
+
+  if (Event.createdBy.uuid != req.user.id)
+    return res.send({
+      error: true,
+      message: "You are not the creator of this event",
+    });
+
+  const Submissions = await SubmissionModel.find({ eventUUID: id });
+
+  return res.send({ error: false, submissions: Submissions, event: Event });
+});
+
 route.get("/user/:userId", async (req, res) => {
   if (!req.user) return res.send({ error: true, message: "Not logged in" });
 
