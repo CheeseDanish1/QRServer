@@ -110,6 +110,7 @@ route.post("/send-analytics", async (req, res) => {
   if (!Event) return res.send({ error: true, message: "Event not found" });
 
   const Submissions = await SubmissionModel.find({ eventUUID: eventId });
+  console.log(Submissions);
 
   sendAnalytics({ emailAddress: email, jsonData: Submissions, event: Event });
 
