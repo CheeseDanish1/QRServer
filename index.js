@@ -15,7 +15,7 @@ const http = require("http").Server(app);
 const PORT = process.env.PORT || 3001;
 const routes = require("./routes");
 const serialize = require("./utils/serialize");
-const path = __dirname + '/views/';
+const path = __dirname + "/views/";
 
 app.use(express.static(path));
 app.use(compression());
@@ -45,7 +45,7 @@ app.use(async (req, res, next) => {
 
 app.use("/", routes);
 
-app.get('/*', function (req,res) {
+app.get("/*", function (req, res) {
   return res.sendFile(path + "index.html");
 });
 
