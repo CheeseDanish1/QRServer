@@ -178,7 +178,7 @@ route.post("/submission/:id/create", async (req, res) => {
 
     // TODO: Followup with twilio about being a business entity
     // if (phone) {
-    //   const link = "https://qr-client.onrender.com/qrcode/" + encodeURIComponent("https://qr-client.onrender.com/redeem/"+user.userUUID);
+    //   const link = "https://qrapp-s4hr.onrender.com/qrcode" + encodeURIComponent("https://qrapp-s4hr.onrender.com/redeem/"+user.userUUID);
     //   sendMessage(
     //     user.userUUID,
     //     event.text.phoneText ||

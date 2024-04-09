@@ -10,3 +10,4 @@ test
 
 public-images/*
 !public-images/.gitkeep 
+!public-images/default-user.jpg

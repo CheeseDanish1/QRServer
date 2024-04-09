@@ -98,7 +98,7 @@ async function sendEmail({ emailAddress, qrCodeId, companyName, emailHTML }) {
     emailHTML +
     '<br/><img style="max-width: 100%; height: auto; display: block; margin: 20px auto" src="' +
     img +
-    '"><br /><p>If the qr code is not loading <a href="' +
+    '"><br /><p>If the QR code is not loading <a href="' +
     link +
     encodeURIComponent(qrCodeEncode) +
     '">click here</a></p></div>';
@@ -107,7 +107,7 @@ async function sendEmail({ emailAddress, qrCodeId, companyName, emailHTML }) {
     from: EMAIL_ADDRESS,
     to: emailAddress,
     subject: `QR Code From ${companyName}`, // Subject line
-    // text: "You may get redeemed by having your qr code scanned", // plain text body
+    // text: "You may get redeemed by having your QR code scanned", // plain text body
     html: html,
     attachDataUrls: true,
   };
