@@ -25,12 +25,17 @@ const storage = multer.diskStorage({
     // dirname = dirnameSplit.join("\\");
     // }
 
-    cb(null, path.join(dirname, "/public-images/"));
+    console.log(path.join(dirname, "../public-images/"));
+
+    cb(null, path.join(dirname, "../public-images/"));
   },
   filename: (req, file, cb) => {
     let extArray = file.mimetype.split("/");
     let extension = extArray[extArray.length - 1];
-    cb(null, Date.now() + "-" + uuidv1() + "." + extension);
+    let id = uuidv1();
+    let name = Date.now() + "-" + id + "." + extension;
+    console.log(name);
+    cb(null, name);
   },
 });
 
@@ -41,10 +46,10 @@ route.post("/image/upload", upload.single("image"), async (req, res) => {
 });
 
 // // Return image
-// route.get("/image/:uuid", (req, res) => {
-//   let { uuid } = req.params;
-//   res.sendFile("./public-images/" + uuid, { root: "./" });
-// });
+route.get("/image/:uuid", (req, res) => {
+  let { uuid } = req.params;
+  res.sendFile("./public-images/" + uuid, { root: "./" });
+});
 
 route.post("/user/upload", upload.single("image"), async (req, res) => {
   if (!req.user) return res.send({ error: true, message: "Not logged in" });
