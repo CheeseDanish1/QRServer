@@ -2,6 +2,7 @@ const route = require("express").Router();
 const { v1: uuidv1 } = require("uuid");
 const multer = require("multer");
 const path = require("path");
+const UserConfig = require("../../database/models/UserConfig");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
