@@ -11,19 +11,15 @@ const storage = multer.diskStorage({
     let dirnameSplit;
     let dirname;
 
-    dirnameSplit = __dirname.split("/");
-    dirnameSplit.pop();
-    dirname = dirnameSplit.join("/");
-
-    // if (process.env.NODE_ENV == "production") {
-    //   dirnameSplit = __dirname.split("/");
-    //   dirnameSplit.pop();
-    //   dirname = dirnameSplit.join("/");
-    // } else if (process.env.NODE_ENV == "development") {
-    // dirnameSplit = __dirname.split("\\");
-    // dirnameSplit.pop();
-    // dirname = dirnameSplit.join("\\");
-    // }
+    if (process.env.ENVIRONMENT == "PRODUCTION") {
+      dirnameSplit = __dirname.split("/");
+      dirnameSplit.pop();
+      dirname = dirnameSplit.join("/");
+    } else if (process.env.ENVIRONMENT == "DEVELOPMENT") {
+      dirnameSplit = __dirname.split("\\");
+      dirnameSplit.pop();
+      dirname = dirnameSplit.join("\\");
+    }
 
     console.log(path.join(dirname, "../public-images/"));
 

@@ -30,6 +30,8 @@ app.use(
   })
 );
 
+console.log("Environment is: " + process.env.ENVIRONMENT);
+
 const { decryptData } = require("./utils/crypt");
 const COOKIE_NAME = "authorization";
 app.use(async (req, res, next) => {

@@ -89,7 +89,7 @@ async function sendEmail({ emailAddress, qrCodeId, companyName, emailHTML }) {
   if (!qrCodeId) return;
   if (!emailHTML) emailHTML = "";
 
-  const APP_URL = "https://qr-client.onrender.com";
+  const APP_URL = process.env.APP_URI;
   const link = APP_URL + "/qrcode/";
   const qrCodeEncode = APP_URL + "/redeem/" + qrCodeId;
   const img = await QRCode.toDataURL(qrCodeEncode);
