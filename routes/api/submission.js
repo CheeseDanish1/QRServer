@@ -70,6 +70,7 @@ route.get("/submissions/:eventId", async (req, res) => {
 route.post("/submission/:id/create", async (req, res) => {
   const { id: eventId } = req.params;
   let { promotion, age, name, email, phone } = req.body;
+
   if (email) email = email.toLowerCase();
 
   let event = await EventModel.findOne({ uuid: eventId });

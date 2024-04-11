@@ -91,7 +91,8 @@ async function sendEmail({ emailAddress, qrCodeId, companyName, emailHTML }) {
 
   const APP_URL = process.env.APP_URI;
   const link = APP_URL + "/qrcode/";
-  const qrCodeEncode = APP_URL + "/redeem/" + qrCodeId;
+  // const qrCodeEncode = APP_URL + "/redeem/" + qrCodeId;
+  const qrCodeEncode = qrCodeId;
   const img = await QRCode.toDataURL(qrCodeEncode);
 
   const html =

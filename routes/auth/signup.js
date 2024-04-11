@@ -60,9 +60,13 @@ router.post("/local/signup", async (req, res) => {
     })),
   }._doc;
   const encryptedUser = encryptData(user, "1w");
+  // Expires in 2 week
   return res
     .status(200)
-    .cookie(COOKIE_NAME, encryptedUser, { httpOnly: true })
+    .cookie(COOKIE_NAME, encryptedUser, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7 * 2,
+    })
     .send({
       user: await serialize.user(user),
       message: "Successfully signed up!",

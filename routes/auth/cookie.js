@@ -14,7 +14,10 @@ router.post("/local/cookie", async (req, res) => {
 
   return res
     .status(200)
-    .cookie(COOKIE_NAME, encryptedUser, { httpOnly: true })
+    .cookie(COOKIE_NAME, encryptedUser, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7 * 2,
+    })
     .send({
       user: await serialize.user(user),
       message: "Cookie updated!",
