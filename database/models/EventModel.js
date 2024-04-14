@@ -36,6 +36,7 @@ const EventConfig = new mongoose.Schema(
     },
     fontColor: String,
     imagePath: String,
+    archived: Boolean,
   },
   { collection: "Events", typeKey: "$type" }
 );

@@ -9,6 +9,7 @@ route.post("/event/create", async (req, res) => {
   let body = req.body;
   let uuid = uuidv1();
   let hasEnded = false;
+  let archived = false;
   let currentCapacity = 0;
   let timeCreated = new Date();
 
@@ -24,6 +25,7 @@ route.post("/event/create", async (req, res) => {
     currentCapacity,
     timeCreated,
     fontColor: "#333333",
+    archived,
   };
   let event = await EventModel.create(eventBody);
   return res.send({ error: false, event });
@@ -41,6 +43,48 @@ route.get("/event/:id", async (req, res) => {
     });
 
   res.send({ error: false, event });
+});
+
+route.post("/event/archive", async (req, res) => {
+  let user = req.user;
+
+  if (!user) return res.send({ error: true, message: "Not logged in" });
+
+  const User = await UserConfig.findOne({ email: user.email });
+  if (!User) return res.send({ error: true, message: "User not found" });
+
+  let { eventId } = req.body;
+
+  const Event = await EventModel.findOne({ uuid: eventId });
+  if (!Event)
+    return res.send({ error: true, message: "No event found with that id" });
+
+  Event.archived = true;
+  await Event.save();
+  // await Event.updateOne({ $set: { archived: true } });
+
+  return res.send({ error: false, message: "Success", event: Event });
+});
+
+route.post("/event/unarchive", async (req, res) => {
+  let user = req.user;
+
+  if (!user) return res.send({ error: true, message: "Not logged in" });
+
+  const User = await UserConfig.findOne({ email: user.email });
+  if (!User) return res.send({ error: true, message: "User not found" });
+
+  let { eventId } = req.body;
+
+  const Event = await EventModel.findOne({ uuid: eventId });
+  if (!Event)
+    return res.send({ error: true, message: "No event found with that id" });
+
+  Event.archived = false;
+  await Event.save();
+  // await Event.updateOne({ $set: { archived: false } });
+
+  return res.send({ error: false, message: "Success", event: Event });
 });
 
 // Update event
