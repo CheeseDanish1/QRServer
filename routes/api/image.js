@@ -22,8 +22,6 @@ const storage = multer.diskStorage({
       dirname = dirnameSplit.join("\\");
     }
 
-    console.log(path.join(dirname, "../public-images/"));
-
     cb(null, path.join(dirname, "../public-images/"));
   },
   filename: (req, file, cb) => {
