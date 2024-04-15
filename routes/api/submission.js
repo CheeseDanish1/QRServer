@@ -180,18 +180,16 @@ route.post("/submission/:id/create", async (req, res) => {
     user = await SubmissionModel.create(submissionObject);
 
     if (phone) {
-      const link =
-        APP_URI +
-        "/qrcode/" +
-        encodeURIComponent(APP_URI + "/redeem/" + user.userUUID);
-      sendMessage(
-      {
-        content: event.text.phoneText ||
-        `Press the following link to get a QR code to redeem your free gift: ${link}`,
-        link,
-        number: "+1" +phone,
-      }
-      );
+      // const link = APP_URI + "/qrcode/" + user.userUUID;
+      let uuid = user.userUUID;
+
+      sendMessage({
+        content:
+          event.text.phoneText ||
+          `Get your QR code scanned to redeem your free gift!`,
+        userUUID: uuid,
+        number: "+1" + phone,
+      });
     }
 
     if (email) {
