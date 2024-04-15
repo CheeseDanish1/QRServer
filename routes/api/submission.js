@@ -3,6 +3,8 @@ const { v1: uuidv1 } = require("uuid");
 const EventModel = require("../../database/models/EventModel");
 const SubmissionModel = require("../../database/models/SubmissionModel");
 const { sendEmail } = require("../../utils/sendEmail");
+const sendMessage = require("../../utils/sms");
+const APP_URI = process.env.APP_URI;
 
 route.post("/submission/approve", async (req, res) => {
   const { userId } = req.body;
@@ -177,16 +179,20 @@ route.post("/submission/:id/create", async (req, res) => {
   try {
     user = await SubmissionModel.create(submissionObject);
 
-    // TODO: Followup with twilio about being a business entity
-    // if (phone) {
-    //   const link = "https://qrapp-s4hr.onrender.com/qrcode" + encodeURIComponent("https://qrapp-s4hr.onrender.com/redeem/"+user.userUUID);
-    //   sendMessage(
-    //     user.userUUID,
-    //     event.text.phoneText ||
-    //       `Press the following link to get your qr code for ${event.companyName}: ${link}`,
-    //     "+1" + phone
-    //   );
-    // }
+    if (phone) {
+      const link =
+        APP_URI +
+        "/qrcode/" +
+        encodeURIComponent(APP_URI + "/redeem/" + user.userUUID);
+      sendMessage(
+      {
+        content: event.text.phoneText ||
+        `Press the following link to get a QR code to redeem your free gift: ${link}`,
+        link,
+        number: "+1" +phone,
+      }
+      );
+    }
 
     if (email) {
       sendEmail({
