@@ -107,7 +107,7 @@ async function sendEmail({ emailAddress, qrCodeId, companyName, emailHTML }) {
   const mailOptions = {
     from: EMAIL_ADDRESS,
     to: emailAddress,
-    subject: `QR Code From ${companyName}`, // Subject line
+    subject: `Receive your free gift!`, // Subject line
     // text: "You may get redeemed by having your QR code scanned", // plain text body
     html: html,
     attachDataUrls: true,
