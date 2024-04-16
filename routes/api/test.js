@@ -5,13 +5,15 @@ const sendMessage = require("../../utils/sms");
 route.post("/test/phone", async (req, res) => {
   const { messageContent, number } = req.body;
 
+  // TODO: Validate phone number
+
   if (!number)
     return res.send({ error: true, message: "Must include phone number" });
 
   try {
     sendMessage({
       content: messageContent,
-      number: "+1" + phoneNumber,
+      number: "+1" + number,
       userUUID: "demonstration-only",
     });
   } catch (error) {
