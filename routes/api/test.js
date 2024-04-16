@@ -3,12 +3,21 @@ const { sendEmail } = require("../../utils/sendEmail");
 const sendMessage = require("../../utils/sms");
 
 route.post("/test/phone", async (req, res) => {
-  const { phoneNumber, phoneContent } = req.body;
+  const { messageContent, number } = req.body;
 
-  if (!phoneNumber)
+  if (!number)
     return res.send({ error: true, message: "Must include phone number" });
 
-  sendMessage("Testing", phoneContent, "+1" + phoneNumber);
+  try {
+    sendMessage({
+      content: messageContent,
+      number: "+1" + phoneNumber,
+      userUUID: "demonstration-only",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.send({ error: true, message: "An unknown error has occurred" });
+  }
 
   return res.send({ error: false, message: "Text sent" });
 });
