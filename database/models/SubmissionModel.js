@@ -12,6 +12,12 @@ const SubmissionConfig = new mongoose.Schema(
       email: String,
       phone: String,
       age: Date,
+      custom: [
+        {
+          title: String,
+          value: String,
+        },
+      ],
     },
     consent: Boolean,
   },

@@ -20,7 +20,8 @@ async function sendAnalytics({ emailAddress, jsonData, event }) {
       const obj = {
         eventUUID: data.eventUUID,
         timeSubmitted: data.timeSubmitted,
-        prizeClaimedYet: data.prizeClaimed,
+        timePrizeClaimed:
+          data.prizeClaimed == true ? data.timePrizeClaimed : false,
         consent: data.consent,
         fields: {},
       };
@@ -34,6 +35,11 @@ async function sendAnalytics({ emailAddress, jsonData, event }) {
     if (event.fields.age) obj.fields["age"] = jsonData[index].fields.age;
     if (event.fields.email) obj.fields["email"] = jsonData[index].fields.email;
     if (event.fields.phone) obj.fields["phone"] = jsonData[index].fields.phone;
+    if (event.companyName.toLowerCase() == "doordash") {
+      obj.fields["bagSize"] = jsonData[index].fields.custom.find(
+        (r) => r.title == "Bag Size"
+      ).value;
+    }
     return obj;
   });
 

@@ -4,7 +4,9 @@ const EventModel = require("../../database/models/EventModel");
 const SubmissionModel = require("../../database/models/SubmissionModel");
 const { sendEmail } = require("../../utils/sendEmail");
 const sendMessage = require("../../utils/sms");
-const APP_URI = process.env.APP_URI;
+const phoneUtil =
+  require("google-libphonenumber").PhoneNumberUtil.getInstance();
+// const APP_URI = process.env.APP_URI;
 
 route.post("/submission/approve", async (req, res) => {
   const { userId } = req.body;
@@ -17,7 +19,7 @@ route.post("/submission/approve", async (req, res) => {
   if (submission.prizeClaimed)
     return res.send({
       error: true,
-      message: "Prize has already been claimed for this user",
+      message: "This QR Code has already been redeemed.",
     });
 
   let event = await EventModel.findOne({ uuid: submission.eventUUID });
@@ -44,7 +46,12 @@ route.post("/submission/approve", async (req, res) => {
 
   await submission.save();
 
-  return res.send({ error: false, message: "QR Code Approved!" });
+  let message = "QR Code Approved!";
+
+  if (event.companyName.toLowerCase() == "doordash")
+    message = `Approved: ${submission.fields?.custom[0]?.value} Bag.`;
+
+  return res.send({ error: false, message: message });
 });
 
 route.get("/submissions/:eventId", async (req, res) => {
@@ -71,7 +78,7 @@ route.get("/submissions/:eventId", async (req, res) => {
 // Create a submission for an event
 route.post("/submission/:id/create", async (req, res) => {
   const { id: eventId } = req.params;
-  let { promotion, age, name, email, phone } = req.body;
+  let { promotion, age, name, email, phone, custom } = req.body;
 
   if (email) email = email.toLowerCase();
 
@@ -120,24 +127,24 @@ route.post("/submission/:id/create", async (req, res) => {
   }
 
   if (event.fields.phone) {
-    let phoneReg = new RegExp(
-      /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/
-    );
+    const number = phoneUtil.parseAndKeepRawInput(phone, "US");
 
-    if (!phoneReg.test(phone))
+    if (!phoneUtil.isValidNumber(number))
       return res.send({
         error: true,
         message: "You must submit a valid phone number",
       });
 
+    if (!phoneUtil.isValidNumberForRegion(number, "US"))
+      return res.send({
+        error: true,
+        message: "You may only use a US phone number",
+      });
+
     // Remove special character so someone can't save the same phone number twice
-    let phone2 = phone.replace(/[^\w\s]/gi, "");
-    if (phone2.split("")[0] == 1) {
-      splitPhone = phone2.split("");
-      splitPhone.shift();
-      phone2 = splitPhone.join("");
-    }
-    phone = phone2;
+
+    phone = number.getNationalNumber();
+    console.log(phone);
 
     let phoneSubmission = await SubmissionModel.findOne({
       eventUUID: eventId,
@@ -164,6 +171,14 @@ route.post("/submission/:id/create", async (req, res) => {
     fieldObject["name"] = name;
   }
 
+  // Remove this from later code
+  if (custom) {
+    fieldObject["custom"] = [];
+    custom.forEach((c) => {
+      fieldObject["custom"].push(c);
+    });
+  }
+
   let userUUID = uuidv1();
 
   let submissionObject = {
@@ -178,9 +193,7 @@ route.post("/submission/:id/create", async (req, res) => {
   let user;
   try {
     user = await SubmissionModel.create(submissionObject);
-
     if (phone) {
-      // const link = APP_URI + "/qrcode/" + user.userUUID;
       let uuid = user.userUUID;
 
       sendMessage({
@@ -192,7 +205,7 @@ route.post("/submission/:id/create", async (req, res) => {
       });
     }
 
-    if (email) {
+    if (email && !phone) {
       sendEmail({
         emailAddress: email,
         qrCodeId: user.userUUID,
