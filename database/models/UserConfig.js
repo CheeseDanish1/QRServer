@@ -12,11 +12,11 @@ const UserConfig = new mongoose.Schema(
     },
     phoneNumber: String,
     address: {
-      street: String, 
-      zip: String, 
-      city: String
-    }
-
+      street: String,
+      zip: String,
+      city: String,
+    },
+    admin: Boolean,
   },
   { collection: "UserConfig", typeKey: "$type" }
 );

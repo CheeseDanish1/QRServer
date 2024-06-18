@@ -71,11 +71,6 @@ async function sendAnalytics({ emailAddress, jsonData, event }) {
     subject: `Analytic Data`, // Subject line
     html: html,
     attachments: [
-      // {
-      //   filename: "analytics.json",
-      //   content: JSON.stringify(json),
-      //   contentType: "application/json",
-      // },
       {
         filename: "analytics.csv",
         content: csvContent,

@@ -37,6 +37,13 @@ const EventConfig = new mongoose.Schema(
     fontColor: String,
     imagePath: String,
     archived: Boolean,
+    sharedWith: [
+      {
+        userUUID: String,
+        username: String,
+        profileImagePath: String,
+      },
+    ],
   },
   { collection: "Events", typeKey: "$type" }
 );

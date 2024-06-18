@@ -48,9 +48,6 @@ route.post("/submission/approve", async (req, res) => {
 
   let message = "QR Code Approved!";
 
-  if (event.companyName.toLowerCase() == "doordash")
-    message = `Approved: ${submission.fields?.custom[0]?.value} Bag.`;
-
   return res.send({ error: false, message: message });
 });
 
@@ -64,7 +61,7 @@ route.get("/submissions/:eventId", async (req, res) => {
   if (!Event)
     return res.send({ error: true, message: "No event with that id found" });
 
-  if (Event.createdBy.uuid != req.user.id)
+  if (Event.createdBy.uuid != req.user.id && req.user.admin == false)
     return res.send({
       error: true,
       message: "You are not the creator of this event",

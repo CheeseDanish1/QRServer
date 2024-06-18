@@ -57,6 +57,7 @@ router.post("/local/signup", async (req, res) => {
       username,
       password: encryptedPassword,
       email,
+      admin: false,
     })),
   }._doc;
   const encryptedUser = encryptData(user, "1w");

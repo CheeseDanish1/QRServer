@@ -108,7 +108,7 @@ route.post("/update-event", async (req, res) => {
   if (!EventCreatedBy)
     return res.send({ error: true, message: "No event found" });
 
-  if (EventCreatedBy.uuid != user.id)
+  if (EventCreatedBy.uuid != user.id && user.admin == false)
     return res.send({
       error: true,
       message: "You are not the user who made this event",
