@@ -35,7 +35,7 @@ route.get("/calendar/data", async (req, res) => {
 
   rows.forEach((row) => {
     individualData[row.get("Submission Id|hidden-5")] = {
-      jobStatus: parseInt(row.get("Job Status|hidden-3")),
+      jobStatus: row.get("Job Status|hidden-3"),
     };
   });
 
