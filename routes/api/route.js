@@ -31,12 +31,18 @@ route.get("/calendar/data", async (req, res) => {
   await sheet.loadHeaderRow();
   const rows = await sheet.getRows();
 
-  let individualData = {};
+  let individualData = [];
 
   rows.forEach((row) => {
-    individualData[row.get("Submission Id|hidden-5")] = {
+    individualData.push({
+      id: row.get("Submission Id|hidden-5"),
       jobStatus: row.get("Job Status|hidden-3"),
-    };
+      startDate: row.get("Start Date|date-1"),
+      endDate: row.get("End Date|date-2"),
+      vehicleType: row.get("Vehicle Type|select-1"),
+      buildRequired:
+        row.get("Does this campaign require a custom build?|radio-1") == "one",
+    });
   });
 
   res.send(individualData);
