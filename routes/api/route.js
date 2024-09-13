@@ -13,6 +13,63 @@ const info = {
     "route-calc-sheet@route-calculator-sheet.iam.gserviceaccount.com",
 };
 
+route.get("/calendar/data", async (req, res) => {
+  const serviceAccountAuth = new JWT({
+    email: info.client_email,
+    key: info.private_key,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+
+  const doc = new GoogleSpreadsheet(
+    "1o0kFgnwA1KuEBPCXbGuDcwHy68Q-FP6ClLB-CBe2OnI",
+    serviceAccountAuth
+  );
+
+  await doc.loadInfo();
+  const sheet = doc.sheetsByIndex[1];
+
+  await sheet.loadHeaderRow();
+  const rows = await sheet.getRows();
+
+  let individualData = {};
+
+  rows.forEach((row) => {
+    individualData[row.get("Submission Id|hidden-5")] = {
+      jobStatus: parseInt(row.get("Job Status|hidden-3")),
+    };
+  });
+
+  res.send(individualData);
+});
+
+route.get("/route/costData", async (req, res) => {
+  const serviceAccountAuth = new JWT({
+    email: info.client_email,
+    key: info.private_key,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+
+  const doc = new GoogleSpreadsheet(
+    "1FBv2LwTw8M4X7xURkFNZVV6S0qwyjFHLKDb_gaMmrRY",
+    serviceAccountAuth
+  );
+
+  await doc.loadInfo();
+  const sheet = doc.sheetsByIndex[1];
+  await sheet.loadHeaderRow();
+  const rows = await sheet.getRows();
+  let individualData = {};
+
+  rows.forEach((row) => {
+    individualData[row.get("NICKNAME")] = {
+      travelCost: parseInt(row.get("TRAVEL COST (Per Day)")),
+      cost: parseInt(row.get("ACTIVATION COST (Per Day)")),
+    };
+  });
+
+  res.send(individualData);
+});
+
 route.get("/route/costData", async (req, res) => {
   const serviceAccountAuth = new JWT({
     email: info.client_email,
